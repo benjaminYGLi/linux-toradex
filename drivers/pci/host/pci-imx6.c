@@ -359,8 +359,11 @@ static int imx6_pcie_deassert_core_reset(struct pcie_port *pp)
 	u32 val;
 	struct imx6_pcie *imx6_pcie = to_imx6_pcie(pp);
 
-	if (gpio_is_valid(imx6_pcie->power_on_gpio))
+	if (gpio_is_valid(imx6_pcie->power_on_gpio)) {
+		mdelay(50);
 		gpio_set_value_cansleep(imx6_pcie->power_on_gpio, 1);
+		mdelay(50);
+	}
 
 	request_bus_freq(BUS_FREQ_HIGH);
 	ret = clk_prepare_enable(imx6_pcie->pcie);
@@ -568,7 +571,7 @@ static int imx6_pcie_wait_for_link(struct pcie_port *pp)
 	struct imx6_pcie *imx6_pcie = to_imx6_pcie(pp);
 
 	while (!dw_pcie_link_up(pp)) {
-		udelay(10);
+		udelay(100);
 		if (--count)
 			continue;
 
